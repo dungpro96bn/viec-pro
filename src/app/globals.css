@@ -1,0 +1,289 @@
+/* ==========================================================================
+   ViecPro — Global styles. Tailwind ĐÃ ĐƯỢC GỠ BỎ, chỉ còn CSS thuần.
+   Biến màu định nghĩa ở :root bên dưới; các trang/section import
+   globals.css + ui.css và dùng trực tiếp var(--primary), var(--border)...
+   ========================================================================== */
+
+/* ------------------------------------------------------------------ */
+/* Brand color tokens (from user spec)                                */
+/*   --primary      #155EEF  Blue 600 (main brand)                    */
+/*   --primary-dark #0B4CCB  Blue 700 (gradient end / hover)          */
+/*   --navy         #0F172A  Slate 900 (footer / dark sections)       */
+/*   --text         #344054  Slate 700 (body text)                    */
+/*   --muted        #667085  Slate 500 (muted text)                   */
+/*   --border       #E4E7EC  Gray 200                                 */
+/*   --background   #F8FAFC  Slate 50                                 */
+/*   --white        #FFFFFF                                           */
+/*   --success      #12B76A  Success 500                              */
+/*   --warning      #F79009  Warning 500 (also used as accent/CTA)    */
+/*   --danger       #F04438  Error 500                                */
+/* ------------------------------------------------------------------ */
+
+:root {
+  --radius: 0.75rem;
+
+  /* Brand */
+  --primary: #155EEF;
+  --primary-dark: #0B4CCB;
+  --primary-foreground: #FFFFFF;
+  --navy: #0F172A;
+
+  /* Semantic statuses */
+  --success: #12B76A;
+  --warning: #F79009;
+  --danger: #F04438;
+
+  /* Surfaces */
+  --background: #F8FAFC;
+  --foreground: #344054;
+  --card: #FFFFFF;
+  --card-foreground: #344054;
+  --popover: #FFFFFF;
+  --popover-foreground: #344054;
+
+  /* Secondary / muted */
+  --secondary: #F2F4F7;
+  --secondary-foreground: #1D2939;
+  --muted: #F2F4F7;
+  --muted-foreground: #667085;
+
+  /* Accent = warning orange (used for HOT badges, salary highlight, CTA pop) */
+  --accent: #F79009;
+  --accent-foreground: #FFFFFF;
+
+  /* Status -> destructive mapping */
+  --destructive: #F04438;
+
+  /* Borders & inputs */
+  --border: #E4E7EC;
+  --input: #E4E7EC;
+  --ring: #155EEF;
+
+  /* Charts - blue family + warm accent for visual variety */
+  --chart-1: #155EEF;
+  --chart-2: #F79009;
+  --chart-3: #12B76A;
+  --chart-4: #7A5AF8;
+  --chart-5: #F04438;
+
+  /* Sidebar */
+  --sidebar: #FFFFFF;
+  --sidebar-foreground: #344054;
+  --sidebar-primary: #155EEF;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #F2F4F7;
+  --sidebar-accent-foreground: #1D2939;
+  --sidebar-border: #E4E7EC;
+  --sidebar-ring: #155EEF;
+}
+
+.dark {
+  --background: #0F172A;
+  --foreground: #F8FAFC;
+  --card: #1E293B;
+  --card-foreground: #F8FAFC;
+  --popover: #1E293B;
+  --popover-foreground: #F8FAFC;
+  --primary: #3B82F6;
+  --primary-foreground: #FFFFFF;
+  --secondary: #1E293B;
+  --secondary-foreground: #F8FAFC;
+  --muted: #1E293B;
+  --muted-foreground: #94A3B8;
+  --accent: #F79009;
+  --accent-foreground: #1A1A1A;
+  --destructive: #F04438;
+  --border: rgba(255, 255, 255, 0.1);
+  --input: rgba(255, 255, 255, 0.16);
+  --ring: #3B82F6;
+  --chart-1: #3B82F6;
+  --chart-2: #F79009;
+  --chart-3: #12B76A;
+  --chart-4: #A78BFA;
+  --chart-5: #F87171;
+  --sidebar: #1E293B;
+  --sidebar-foreground: #F8FAFC;
+  --sidebar-primary: #3B82F6;
+  --sidebar-primary-foreground: #FFFFFF;
+  --sidebar-accent: #1E293B;
+  --sidebar-accent-foreground: #F8FAFC;
+  --sidebar-border: rgba(255, 255, 255, 0.1);
+  --sidebar-ring: #3B82F6;
+}
+
+/* ------------------------------------------------------------------ */
+/* Reset tối giản (thay cho Tailwind preflight)                        */
+/* ------------------------------------------------------------------ */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+  border-width: 0;
+  border-style: solid;
+  border-color: var(--border);
+}
+* {
+  margin: 0;
+}
+html {
+  scroll-behavior: smooth;
+  -webkit-text-size-adjust: 100%;
+  line-height: 1.5;
+  tab-size: 4;
+}
+body {
+  background: var(--background);
+  color: var(--foreground);
+  font-family: var(--font-be-vietnam-pro), system-ui, -apple-system, "Segoe UI",
+    Roboto, Helvetica, Arial, sans-serif;
+  font-feature-settings: "ss01", "cv01";
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+  line-height: 1.5;
+}
+h1, h2, h3, h4, h5, h6 {
+  font-size: inherit;
+  font-weight: inherit;
+  line-height: 1.2;
+}
+ul, ol {
+  list-style: none;
+  padding: 0;
+}
+a {
+  color: inherit;
+  text-decoration: inherit;
+}
+img, svg, video, canvas, audio, iframe, embed, object {
+  display: block;
+  vertical-align: middle;
+}
+img, video {
+  max-width: 100%;
+}
+input, button, textarea, select {
+  font: inherit;
+  color: inherit;
+  letter-spacing: inherit;
+}
+button {
+  background: none;
+  cursor: pointer;
+}
+:focus-visible {
+  outline: 2px solid color-mix(in srgb, var(--ring) 50%, transparent);
+  outline-offset: 1px;
+}
+
+/* Custom utilities */
+.text-balance {
+    text-wrap: balance;
+  }
+  .text-pretty {
+    text-wrap: pretty;
+  }
+  .scrollbar-hide::-webkit-scrollbar {
+    display: none;
+  }
+  .scrollbar-hide {
+    -ms-overflow-style: none;
+    scrollbar-width: none;
+  }
+
+  /* Scrollbar that stays invisible until the container is hovered.
+     Used by the sticky filter sidebar on the jobs page. */
+  .hover-scrollbar {
+    scrollbar-width: thin;
+    scrollbar-color: transparent transparent;
+  }
+  .hover-scrollbar:hover {
+    scrollbar-color: rgba(102, 112, 133, 0.4) transparent;
+  }
+  .hover-scrollbar::-webkit-scrollbar {
+    width: 8px;
+    height: 8px;
+  }
+  .hover-scrollbar::-webkit-scrollbar-track {
+    background: transparent;
+  }
+  .hover-scrollbar::-webkit-scrollbar-thumb {
+    background-color: transparent;
+    border-radius: 9999px;
+    border: 2px solid transparent;
+    background-clip: content-box;
+    transition: background-color 0.2s ease;
+  }
+  .hover-scrollbar:hover::-webkit-scrollbar-thumb {
+    background-color: rgba(102, 112, 133, 0.35);
+  }
+  .hover-scrollbar::-webkit-scrollbar-thumb:hover {
+    background-color: rgba(102, 112, 133, 0.6);
+  }
+
+  /* Mesh background using brand blue + warning orange */
+  .gradient-mesh {
+    background-image:
+      radial-gradient(at 0% 0%, rgba(21, 94, 239, 0.10) 0px, transparent 50%),
+      radial-gradient(at 80% 10%, rgba(247, 144, 9, 0.08) 0px, transparent 50%),
+      radial-gradient(at 100% 60%, rgba(11, 76, 203, 0.08) 0px, transparent 50%);
+  }
+
+  /* Primary blue gradient (#155EEF -> #0B4CCB) */
+  .gradient-primary {
+    background-image: linear-gradient(135deg, #155EEF 0%, #0B4CCB 100%);
+  }
+
+  /* Gradient text using brand blue */
+  .gradient-text {
+    background-image: linear-gradient(135deg, #155EEF 0%, #0B4CCB 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Navy background utility (for dark sections / footer) */
+  .bg-navy {
+    background-color: #0F172A;
+  }
+
+  .shadow-soft {
+    box-shadow:
+      0 1px 2px 0 rgba(15, 23, 42, 0.06),
+      0 4px 12px -2px rgba(15, 23, 42, 0.08);
+  }
+  .shadow-card-hover {
+    box-shadow:
+      0 1px 2px 0 rgba(15, 23, 42, 0.06),
+      0 12px 28px -6px rgba(21, 94, 239, 0.12);
+  }
+  .glass-effect {
+    backdrop-filter: blur(12px) saturate(180%);
+    background-color: rgba(255, 255, 255, 0.7);
+  }
+
+/* Marquee animation for trusted-by strip */
+@keyframes marquee {
+  0% {
+    transform: translateX(0);
+  }
+  100% {
+    transform: translateX(-50%);
+  }
+}
+.animate-marquee {
+  animation: marquee 30s linear infinite;
+}
+.animate-marquee:hover {
+  animation-play-state: paused;
+}
+
+/* Tailwind removed — plain CSS only. */
+/* Skeleton shimmer */
+@keyframes shimmer {
+  0% {
+    background-position: -1000px 0;
+  }
+  100% {
+    background-position: 1000px 0;
+  }
+}
