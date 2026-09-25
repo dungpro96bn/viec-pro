@@ -11,9 +11,14 @@ import {
   ChevronLeft,
   ChevronRight,
   MoreHorizontal,
+  X,
 } from "lucide-react";
-import { sampleJobs, sortOptions, type XkldJob } from "@/lib/xkld-data";
+import { buildJobDataset, countries, sortOptions, type Country, type XkldJob } from "@/lib/xkld-data";
 import { JobListCard } from "@/components/jobs/job-list-card";
+import { JobApplyModal } from "@/components/job-detail/job-apply-modal";
+import { toApplySummary } from "@/lib/job-details";
+import { Dropdown } from "@/components/common/dropdown";
+import { CountryFlag } from "@/components/common/country-flag";
 import {
   JobFilterSidebar,
   ActiveFilterChips,
@@ -22,36 +27,7 @@ import {
   type JobFilters,
 } from "@/components/jobs/job-filter-sidebar";
 
-const PAGE_SIZE = 6;
-const POSTED_POOL = [
-  "1 giờ trước",
-  "3 giờ trước",
-  "6 giờ trước",
-  "hôm qua",
-  "2 ngày trước",
-  "3 ngày trước",
-  "5 ngày trước",
-  "1 tuần trước",
-];
-
-/** Expand the 6 seed jobs into a fuller, deterministic dataset for the listing. */
-function buildDataset(): XkldJob[] {
-  const out: XkldJob[] = [];
-  sampleJobs.forEach((job, gi) => {
-    for (let r = 0; r < 4; r++) {
-      const idx = gi * 4 + r;
-      out.push({
-        ...job,
-        id: job.id + r * 100,
-        views: Math.max(12, job.views + r * 41 - gi * 7),
-        postedAt: POSTED_POOL[idx % POSTED_POOL.length],
-        isNew: r === 0 ? job.isNew : false,
-        isHot: r % 2 === 0 ? job.isHot : false,
-      });
-    }
-  });
-  return out;
-}
+const PAGE_SIZE = 20;
 
 function matchSalary(usd: number, range: string): boolean {
   switch (range) {
@@ -69,6 +45,17 @@ function matchSalary(usd: number, range: string): boolean {
       return true;
   }
 }
+
+const regions: { key: Country["region"]; label: string }[] = [
+  { key: "asia", label: "Châu Á" },
+  { key: "europe", label: "Châu Âu" },
+  { key: "middle-east", label: "Trung Đông & Bắc Phi" },
+  { key: "other", label: "Khác" },
+];
+
+/** Giá trị cho dropdown 1 lựa chọn khi sidebar cho chọn nhiều: nhiều mục -> "" (hiện placeholder "N mục") */
+const pickValue = (arr: string[]) => (arr.length === 0 ? "all" : arr.length === 1 ? arr[0] : "");
+
 
 const feeOrder: Record<XkldJob["fee"], number> = {
   "Miễn phí": 0,
@@ -90,19 +77,21 @@ function getPageItems(current: number, total: number): (number | "ellipsis")[] {
 }
 
 export function JobsExplorer() {
-  const allJobs = useMemo(() => buildDataset(), []);
+  const allJobs = useMemo(() => buildJobDataset(), []);
 
   const [keyword, setKeyword] = useState("");
   const [filters, setFilters] = useState<JobFilters>(emptyFilters);
   const [sort, setSort] = useState("newest");
   const [page, setPage] = useState(1);
   const [mobileFilterOpen, setMobileFilterOpen] = useState(false);
+  const [applyJob, setApplyJob] = useState<XkldJob | null>(null);
   const listTopRef = useRef<HTMLDivElement>(null);
 
-  const countryOptions = useMemo(
-    () => Array.from(new Set(allJobs.map((j) => j.country))),
-    [allJobs]
-  );
+  const countryJobCounts = useMemo(() => {
+    const map = new Map<string, number>();
+    for (const j of allJobs) map.set(j.country, (map.get(j.country) ?? 0) + 1);
+    return map;
+  }, [allJobs]);
   const industryOptions = useMemo(
     () => Array.from(new Set(allJobs.map((j) => j.industry))),
     [allJobs]
@@ -158,6 +147,18 @@ export function JobsExplorer() {
     setPage(1);
   }, [keyword, filters, sort]);
 
+  // Drawer mobile: khóa cuộn trang nền, Esc để đóng
+  useEffect(() => {
+    if (!mobileFilterOpen) return;
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && setMobileFilterOpen(false);
+    document.documentElement.style.overflow = "hidden";
+    window.addEventListener("keydown", onKey);
+    return () => {
+      document.documentElement.style.overflow = "";
+      window.removeEventListener("keydown", onKey);
+    };
+  }, [mobileFilterOpen]);
+
   const activeCount = countActiveFilters(filters);
   const totalPages = Math.max(1, Math.ceil(filtered.length / PAGE_SIZE));
   const currentPage = Math.min(page, totalPages);
@@ -176,78 +177,99 @@ export function JobsExplorer() {
     <div className="jobs-page">
       {/* ============= TOP: SEARCH ============= */}
       <section className="jobs-search">
+        <div className="jobs-search__bg" aria-hidden />
         <div className="jobs-container jobs-search__inner">
           <h1 className="jobs-search__title">
             Tìm việc làm <span className="jobs-search__title-accent">xuất khẩu lao động</span>
           </h1>
-          <p className="jobs-search__subtitle">
-            {allJobs.length.toLocaleString("vi-VN")}+ đơn hàng từ các doanh nghiệp XKLĐ uy tín, cập nhật mỗi ngày.
-          </p>
 
-          <div className="jobs-search__form">
-            <div className="jobs-field">
-              <span className="jobs-field__icon">
-                <Search size={16} />
+          <form
+            className="jobs-search__form"
+            role="search"
+            onSubmit={(e) => {
+              e.preventDefault();
+              listTopRef.current?.scrollIntoView({ behavior: "smooth", block: "start" });
+            }}
+          >
+            <div className="jobs-search__field jobs-search__field--keyword">
+              <span className="jobs-search__icon">
+                <Search size={18} />
               </span>
-              <input
-                className="jobs-input"
-                value={keyword}
-                onChange={(e) => setKeyword(e.target.value)}
-                placeholder="Từ khóa, tên đơn hàng, công ty XKLĐ..."
-              />
+              <label className="jobs-search__control">
+                <span className="jobs-search__label">Từ khóa</span>
+                <input
+                  className="jobs-search__input"
+                  value={keyword}
+                  onChange={(e) => setKeyword(e.target.value)}
+                  placeholder="Tên đơn hàng, công ty, ngành nghề..."
+                  type="search"
+                />
+              </label>
+              {keyword && (
+                <button type="button" className="jobs-search__clear" onClick={() => setKeyword("")} aria-label="Xóa từ khóa">
+                  <X size={14} />
+                </button>
+              )}
             </div>
 
-            <div className="jobs-field">
-              <span className="jobs-field__icon">
-                <Globe2 size={16} />
+            <div className="jobs-search__field">
+              <span className="jobs-search__icon">
+                <Globe2 size={18} />
               </span>
-              <select
-                className="jobs-select"
-                value={filters.countries[0] ?? "all"}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    countries: e.target.value === "all" ? [] : [e.target.value],
-                  }))
-                }
-              >
-                <option value="all">Tất cả quốc gia</option>
-                {countryOptions.map((c) => (
-                  <option key={c} value={c}>
-                    {c}
-                  </option>
-                ))}
-              </select>
+              <div className="jobs-search__control">
+                <span className="jobs-search__label">Quốc gia</span>
+                <Dropdown
+                  className="jobs-search__select"
+                  aria-label="Quốc gia"
+                  searchPlaceholder="Tìm quốc gia..."
+                  value={pickValue(filters.countries)}
+                  placeholder={`${filters.countries.length} quốc gia`}
+                  onChange={(v) => setFilters((f) => ({ ...f, countries: v === "all" ? [] : [v] }))}
+                  groups={[
+                    { label: "", options: [{ value: "all", label: "Tất cả quốc gia" }] },
+                    ...regions.map((r) => ({
+                      label: r.label,
+                      options: countries
+                        .filter((c) => c.region === r.key)
+                        .map((c) => ({
+                          value: c.name,
+                          label: c.name,
+                          meta: countryJobCounts.has(c.name) ? String(countryJobCounts.get(c.name)) : undefined,
+                          icon: <CountryFlag code={c.flagCode} />,
+                        })),
+                    })),
+                  ]}
+                />
+              </div>
             </div>
 
-            <div className="jobs-field">
-              <span className="jobs-field__icon">
-                <Factory size={16} />
+            <div className="jobs-search__field">
+              <span className="jobs-search__icon">
+                <Factory size={18} />
               </span>
-              <select
-                className="jobs-select"
-                value={filters.industries[0] ?? "all"}
-                onChange={(e) =>
-                  setFilters((f) => ({
-                    ...f,
-                    industries: e.target.value === "all" ? [] : [e.target.value],
-                  }))
-                }
-              >
-                <option value="all">Mọi ngành nghề</option>
-                {industryOptions.map((i) => (
-                  <option key={i} value={i}>
-                    {i}
-                  </option>
-                ))}
-              </select>
+              <div className="jobs-search__control">
+                <span className="jobs-search__label">Ngành nghề</span>
+                <Dropdown
+                  className="jobs-search__select"
+                  aria-label="Ngành nghề"
+                  searchPlaceholder="Tìm ngành nghề..."
+                  value={pickValue(filters.industries)}
+                  placeholder={`${filters.industries.length} ngành nghề`}
+                  onChange={(v) => setFilters((f) => ({ ...f, industries: v === "all" ? [] : [v] }))}
+                  options={[
+                    { value: "all", label: "Mọi ngành nghề" },
+                    ...industryOptions.map((i) => ({ value: i, label: i })),
+                  ]}
+                />
+              </div>
             </div>
 
-            <button type="button" className="btn btn--primary btn--lg">
-              <Search size={16} />
-              <span>Tìm</span>
+            <button type="submit" className="btn btn--primary jobs-search__submit">
+              <Search size={18} />
+              <span>Tìm kiếm</span>
             </button>
-          </div>
+          </form>
+
         </div>
       </section>
 
@@ -282,18 +304,13 @@ export function JobsExplorer() {
                   <span className="jobs-sort__icon">
                     <ArrowDownWideNarrow size={14} />
                   </span>
-                  <select
+                  <Dropdown
                     className="jobs-sort__select"
-                    value={sort}
-                    onChange={(e) => setSort(e.target.value)}
                     aria-label="Sắp xếp"
-                  >
-                    {sortOptions.map((o) => (
-                      <option key={o.value} value={o.value}>
-                        {o.label}
-                      </option>
-                    ))}
-                  </select>
+                    value={sort}
+                    onChange={setSort}
+                    options={sortOptions}
+                  />
                 </div>
               </div>
             </div>
@@ -331,6 +348,7 @@ export function JobsExplorer() {
                       job={job}
                       saved={savedJobs.has(job.id)}
                       onToggleSave={() => toggleSave(job.id)}
+                      onApply={() => setApplyJob(job)}
                     />
                   ))}
                 </div>
@@ -399,6 +417,10 @@ export function JobsExplorer() {
           </div>
         </div>
       </section>
+
+      {applyJob && (
+        <JobApplyModal key={applyJob.id} job={toApplySummary(applyJob)} autoOpen onClosed={() => setApplyJob(null)} />
+      )}
 
       {/* ============= MOBILE FILTER DRAWER ============= */}
       <div className={`drawer${mobileFilterOpen ? " drawer--open" : ""}`} aria-hidden={!mobileFilterOpen}>

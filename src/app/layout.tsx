@@ -1,8 +1,8 @@
 import type { Metadata } from "next";
 import { Be_Vietnam_Pro } from "next/font/google";
-import "./globals.css";
-import "./ui.css";
+import "./styles.css";
 import { Toaster } from "@/components/ui/toaster";
+import { ThemeSwitcher, themeInitScript } from "@/components/common/theme-switcher";
 
 const beVietnamPro = Be_Vietnam_Pro({
   variable: "--font-be-vietnam-pro",
@@ -44,8 +44,12 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="vi" suppressHydrationWarning>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: themeInitScript }} />
+      </head>
       <body className={beVietnamPro.variable}>
         {children}
+        <ThemeSwitcher />
         <Toaster />
       </body>
     </html>

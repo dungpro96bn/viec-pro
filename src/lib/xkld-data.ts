@@ -173,6 +173,8 @@ export type XkldJob = {
   country: string;
   /** ISO 3166-1 alpha-2 code (lowercase) - dùng để load /flags/{code}.svg */
   flagCode: string;
+  /** Emoji cờ (hiển thị trên card) */
+  countryFlag: string;
   /** Thumbnail image path */
   image: string;
   salary: string;
@@ -205,6 +207,7 @@ export const sampleJobs: XkldJob[] = [
     id: 1,
     title: "[Đơn miễn phí] Tuyển 25 nữ sản xuất các sản phẩm điện tử tại Tân Bắc, Đài Loan",
     country: "Đài Loan",
+    flagCode: "tw",
     countryFlag: "🇹🇼",
     image: "/jobs/job-1.jpg",
     salary: "29.500 Đài tệ/tháng",
@@ -217,7 +220,7 @@ export const sampleJobs: XkldJob[] = [
     industry: "Sản xuất / Lắp ráp điện tử",
     location: "TP. Hồ Chí Minh",
     employer: "Phạm Xuân Trường",
-    employerAvatar: "/employers/employer-1.webp",
+    employerAvatar: "/avatars/default-male.svg",
     employerRating: 4,
     views: 162,
     phone: "0968803554",
@@ -230,6 +233,7 @@ export const sampleJobs: XkldJob[] = [
     id: 2,
     title: "Phí thấp - Liên Bang Nga tuyển 10 nam thợ mộc nội thất",
     country: "Nga",
+    flagCode: "ru",
     countryFlag: "🇷🇺",
     image: "/jobs/job-2.jpg",
     salary: "950 USD/tháng",
@@ -242,7 +246,7 @@ export const sampleJobs: XkldJob[] = [
     industry: "Xây dựng / Vận hành máy",
     location: "Hà Nội",
     employer: "Phạm Xuân Trường",
-    employerAvatar: "/employers/employer-1.webp",
+    employerAvatar: "/avatars/default-male.svg",
     employerRating: 4,
     views: 89,
     phone: "0968803554",
@@ -253,6 +257,7 @@ export const sampleJobs: XkldJob[] = [
     id: 3,
     title: "[Lương cao] Tuyển 10 nam Sản xuất phụ tùng, linh kiện ô tô tại Tochigi, Nhật Bản",
     country: "TTS Nhật Bản",
+    flagCode: "jp",
     countryFlag: "🇯🇵",
     image: "/jobs/job-3.jpg",
     salary: "186.000 Yên/tháng",
@@ -265,7 +270,7 @@ export const sampleJobs: XkldJob[] = [
     industry: "Sản xuất / Lắp ráp điện tử",
     location: "Hà Nội",
     employer: "Phạm Xuân Trường",
-    employerAvatar: "/employers/employer-1.webp",
+    employerAvatar: "/avatars/default-male.svg",
     employerRating: 4,
     views: 245,
     phone: "0968803554",
@@ -277,6 +282,7 @@ export const sampleJobs: XkldJob[] = [
     id: 4,
     title: "[Hồ Chí Minh] ITW Việt Nam tuyển 20 Nam Nữ kỹ thuật viên chế biến thực phẩm tại CHLB Đức",
     country: "Đức",
+    flagCode: "de",
     countryFlag: "🇩🇪",
     image: "/jobs/job-4.jpg",
     salary: "2.713 Euro/tháng",
@@ -289,7 +295,7 @@ export const sampleJobs: XkldJob[] = [
     industry: "Thực phẩm / Đầu bếp",
     location: "TP. Hồ Chí Minh",
     employer: "Mr. Cảnh - ITW Việt Nam",
-    employerAvatar: "/employers/employer-2.webp",
+    employerAvatar: "/avatars/default-male.svg",
     employerRating: 5,
     views: 318,
     phone: "0785171899",
@@ -300,6 +306,7 @@ export const sampleJobs: XkldJob[] = [
     id: 5,
     title: "[Hồ Chí Minh] ITW Việt Nam tuyển 15 nam nữ đứng bếp, phụ bếp lương cao tại Bulgaria",
     country: "Bulgaria",
+    flagCode: "bg",
     countryFlag: "🇧🇬",
     image: "/jobs/job-5.jpg",
     salary: "900 Euro/tháng",
@@ -312,7 +319,7 @@ export const sampleJobs: XkldJob[] = [
     industry: "Thực phẩm / Đầu bếp",
     location: "TP. Hồ Chí Minh",
     employer: "Mr. Cảnh - ITW Việt Nam",
-    employerAvatar: "/employers/employer-2.webp",
+    employerAvatar: "/avatars/default-male.svg",
     employerRating: 5,
     views: 174,
     phone: "0785171899",
@@ -322,6 +329,7 @@ export const sampleJobs: XkldJob[] = [
     id: 6,
     title: "[Phí thấp] Tuyển 16 nam thợ lái máy xây dựng tại Đài Loan",
     country: "Đài Loan",
+    flagCode: "tw",
     countryFlag: "🇹🇼",
     image: "/jobs/job-6.jpg",
     salary: "29.500 Đài tệ/tháng",
@@ -334,7 +342,7 @@ export const sampleJobs: XkldJob[] = [
     industry: "Xây dựng / Vận hành máy",
     location: "TP. Hồ Chí Minh",
     employer: "Nguyễn Quỳnh Nga",
-    employerAvatar: "/employers/employer-3.webp",
+    employerAvatar: "/avatars/default-female.svg",
     employerRating: 4,
     views: 132,
     phone: "0862040999",
@@ -342,3 +350,35 @@ export const sampleJobs: XkldJob[] = [
     isHot: true,
   },
 ];
+
+const postedTimeSamples = [
+  "1 giờ trước",
+  "3 giờ trước",
+  "6 giờ trước",
+  "hôm qua",
+  "2 ngày trước",
+  "3 ngày trước",
+  "5 ngày trước",
+  "1 tuần trước",
+];
+
+/** Expand the seed jobs into a deterministic list for paginated views. */
+export function buildJobDataset(): XkldJob[] {
+  const jobs: XkldJob[] = [];
+
+  sampleJobs.forEach((job, jobIndex) => {
+    for (let repeat = 0; repeat < 4; repeat++) {
+      const index = jobIndex * 4 + repeat;
+      jobs.push({
+        ...job,
+        id: job.id + repeat * 100,
+        views: Math.max(12, job.views + repeat * 41 - jobIndex * 7),
+        postedAt: postedTimeSamples[index % postedTimeSamples.length],
+        isNew: repeat === 0 ? job.isNew : false,
+        isHot: repeat % 2 === 0 ? job.isHot : false,
+      });
+    }
+  });
+
+  return jobs;
+}

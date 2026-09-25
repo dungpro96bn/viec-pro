@@ -1,8 +1,14 @@
 "use client";
 
-import { useMemo } from "react";
+import { Children, useMemo, useState } from "react";
 import { SlidersHorizontal, X, RotateCcw, ChevronDown } from "lucide-react";
-import { salaryRanges, type XkldJob } from "@/lib/xkld-data";
+import { countries, salaryRanges, type XkldJob } from "@/lib/xkld-data";
+import { CountryFlag } from "@/components/common/country-flag";
+
+/** Số lựa chọn hiện sẵn trong mỗi nhóm; nhiều hơn thì có nút "Xem thêm" */
+const VISIBLE_LIMIT = 10;
+
+const flagByCountry = Object.fromEntries(countries.map((c) => [c.name, c.flagCode]));
 
 export type JobFilters = {
   countries: string[];
@@ -139,7 +145,12 @@ export function JobFilterSidebar({
   onChange: (next: JobFilters) => void;
   onReset: () => void;
 }) {
-  const countryFacets = useMemo(() => facetCounts(jobs, (j) => j.country), [jobs]);
+  // Liệt kê đủ mọi quốc gia; nước có nhiều đơn lên trước (sort ổn định giữ thứ tự gốc)
+  const countryFacets = useMemo(() => {
+    const counts = new Map(facetCounts(jobs, (j) => j.country).map((f) => [f.value, f.count]));
+    const names = [...countries.map((c) => c.name), ...[...counts.keys()].filter((n) => !countries.some((c) => c.name === n))];
+    return names.map((value) => ({ value, count: counts.get(value) ?? 0 })).sort((a, b) => b.count - a.count);
+  }, [jobs]);
   const industryFacets = useMemo(() => facetCounts(jobs, (j) => j.industry), [jobs]);
   const feeFacets = useMemo(() => facetCounts(jobs, (j) => j.fee), [jobs]);
   const genderFacets = useMemo(() => facetCounts(jobs, (j) => j.gender), [jobs]);
@@ -155,7 +166,7 @@ export function JobFilterSidebar({
       {/* Header */}
       <div className="filter__header">
         <div className="filter__title-wrap">
-          <SlidersHorizontal size={16} color="var(--primary)" />
+          <SlidersHorizontal size={16} color="var(--primary-text)" />
           <h2 className="filter__title">Bộ lọc</h2>
           {activeCount > 0 && <span className="badge badge--count">{activeCount}</span>}
         </div>
@@ -179,6 +190,7 @@ export function JobFilterSidebar({
             <CheckboxRow
               key={f.value}
               label={f.value}
+              icon={<CountryFlag code={flagByCountry[f.value]} />}
               count={f.count}
               checked={filters.countries.includes(f.value)}
               onChange={() => onChange({ ...filters, countries: toggleIn(filters.countries, f.value) })}
@@ -269,6 +281,10 @@ function FilterSection({
   defaultOpen?: boolean;
   children: React.ReactNode;
 }) {
+  const [expanded, setExpanded] = useState(false);
+  const items = Children.toArray(children);
+  const hidden = items.length - VISIBLE_LIMIT;
+
   return (
     <details className="filter-section" open={defaultOpen}>
       <summary className="filter-section__summary">
@@ -277,18 +293,28 @@ function FilterSection({
           <ChevronDown size={16} />
         </span>
       </summary>
-      <div className="filter-section__content">{children}</div>
+      <div className="filter-section__content">
+        {expanded || hidden <= 0 ? items : items.slice(0, VISIBLE_LIMIT)}
+        {hidden > 0 && (
+          <button type="button" className="filter-more" onClick={() => setExpanded((v) => !v)} aria-expanded={expanded}>
+            {expanded ? "Thu gọn" : `Xem thêm ${hidden} lựa chọn`}
+            <ChevronDown size={14} className={expanded ? "filter-more__icon--up" : undefined} />
+          </button>
+        )}
+      </div>
     </details>
   );
 }
 
 function CheckboxRow({
   label,
+  icon,
   count,
   checked,
   onChange,
 }: {
   label: string;
+  icon?: React.ReactNode;
   count?: number;
   checked: boolean;
   onChange: () => void;
@@ -296,6 +322,7 @@ function CheckboxRow({
   return (
     <label className="filter-option">
       <input type="checkbox" className="filter-option__control" checked={checked} onChange={onChange} />
+      {icon && <span className="filter-option__icon">{icon}</span>}
       <span className="filter-option__label">{label}</span>
       {typeof count === "number" && <span className="filter-option__count">{count}</span>}
     </label>

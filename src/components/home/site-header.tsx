@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import Link from "next/link";
-import { Briefcase, Menu, X, ChevronDown, Phone } from "lucide-react";
+import { Briefcase, Menu, X, Phone } from "lucide-react";
 import { mainNav } from "@/lib/home-data";
 
 export function SiteHeader() {
@@ -67,7 +67,6 @@ export function SiteHeader() {
               <Link href="#" className="btn btn--primary btn--sm">Đăng ký miễn phí</Link>
               <Link href="#" className="btn btn--primary-outline btn--sm">
                 Nhà tuyển dụng
-                <ChevronDown size={12} />
               </Link>
             </div>
 
@@ -123,7 +122,7 @@ export function SiteHeader() {
             <Link href="#" className="btn btn--primary btn--md" style={{ justifyContent: "flex-start" }}>
               Đăng ký miễn phí
             </Link>
-            <Link href="#" className="btn btn--ghost btn--md" style={{ justifyContent: "flex-start", color: "var(--primary)" }}>
+            <Link href="#" className="btn btn--ghost btn--md" style={{ justifyContent: "flex-start", color: "var(--primary-text)" }}>
               Dành cho nhà tuyển dụng
             </Link>
           </div>

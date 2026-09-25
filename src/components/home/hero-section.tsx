@@ -19,6 +19,8 @@ import {
   Tag,
   Factory,
 } from "lucide-react";
+import { Dropdown } from "@/components/common/dropdown";
+import { CountryFlag } from "@/components/common/country-flag";
 import {
   countries,
   orderFeeTypes,
@@ -176,30 +178,38 @@ export function HeroSection() {
 
               <div className="hfield">
                 <span className="hfield__icon"><Globe2 size={16} /></span>
-                <select className="hselect" value={country} onChange={(e) => setCountry(e.target.value)}>
-                  <option value="all">Tất cả quốc gia</option>
-                  {regions.map((r) => (
-                    <optgroup key={r.key} label={r.label}>
-                      {countries
+                <Dropdown
+                  className="hselect"
+                  aria-label="Quốc gia"
+                  value={country}
+                  onChange={setCountry}
+                  searchPlaceholder="Tìm quốc gia..."
+                  groups={[
+                    { label: "", options: [{ value: "all", label: "Tất cả quốc gia" }] },
+                    ...regions.map((r) => ({
+                      label: r.label,
+                      options: countries
                         .filter((c) => c.region === r.key)
-                        .map((c) => (
-                          <option key={c.id} value={c.id}>
-                            {c.name} ({c.count.toLocaleString("vi-VN")})
-                          </option>
-                        ))}
-                    </optgroup>
-                  ))}
-                </select>
+                        .map((c) => ({
+                          value: c.id,
+                          label: c.name,
+                          meta: c.count.toLocaleString("vi-VN"),
+                          icon: <CountryFlag code={c.flagCode} />,
+                        })),
+                    })),
+                  ]}
+                />
               </div>
 
               <div className="hfield">
                 <span className="hfield__icon"><MapPin size={16} /></span>
-                <select className="hselect" value={regLocation} onChange={(e) => setRegLocation(e.target.value)}>
-                  <option value="all">Nơi đăng ký</option>
-                  {registrationLocations.slice(1).map((l) => (
-                    <option key={l.value} value={l.value}>{l.label}</option>
-                  ))}
-                </select>
+                <Dropdown
+                  className="hselect"
+                  aria-label="Nơi đăng ký"
+                  value={regLocation}
+                  onChange={setRegLocation}
+                  options={[{ value: "all", label: "Nơi đăng ký" }, ...registrationLocations.slice(1)]}
+                />
               </div>
 
               <button type="button" className="btn btn--primary btn--lg">
@@ -213,7 +223,7 @@ export function HeroSection() {
               <div className="adv" role="dialog" aria-label="Tìm kiếm nâng cao">
                 <div className="adv__header">
                   <h3 className="adv__title">
-                    <SlidersHorizontal size={16} color="var(--primary)" />
+                    <SlidersHorizontal size={16} color="var(--primary-text)" />
                     Tìm kiếm nâng cao
                     {activeFilterCount > 0 && (
                       <span className="badge badge--count">{activeFilterCount} bộ lọc</span>
@@ -309,11 +319,7 @@ function AdvSelect({
         {icon}
         <span style={{ overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{label}</span>
       </label>
-      <select className="hselect" value={value} onChange={(e) => onChange(e.target.value)}>
-        {options.map((o) => (
-          <option key={o.value} value={o.value}>{o.label}</option>
-        ))}
-      </select>
+      <Dropdown className="hselect" aria-label={label} value={value} onChange={onChange} options={options} />
     </div>
   );
 }

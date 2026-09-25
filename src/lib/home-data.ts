@@ -43,27 +43,6 @@ export type Company = {
   size: string;
 };
 
-export type Article = {
-  id: number;
-  title: string;
-  excerpt: string;
-  category: string;
-  image: string;
-  author: string;
-  publishedAt: string;
-  readTime: string;
-};
-
-export type Testimonial = {
-  id: number;
-  name: string;
-  role: string;
-  avatar: string;
-  content: string;
-  rating: number;
-  company: string;
-};
-
 export type NavItem = {
   label: string;
   href: string;
@@ -429,108 +408,6 @@ export const companies: Company[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/*                                ARTICLES                                    */
-/* -------------------------------------------------------------------------- */
-
-export const articles: Article[] = [
-  {
-    id: 1,
-    title: "10 Xu hướng tuyển dụng IT năm 2026 bạn cần biết",
-    excerpt:
-      "AI, Cloud Computing và Cybersecurity tiếp tục dẫn đầu. Tìm hiểu những kỹ năng nóng nhất và cách chuẩn bị CV ghi điểm với nhà tuyển dụng.",
-    category: "Trends",
-    image:
-      "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&w=800&q=80",
-    author: "Nguyễn Minh Anh",
-    publishedAt: "12/09/2026",
-    readTime: "5 phút",
-  },
-  {
-    id: 2,
-    title: "Cách viết CV xin việc ấn tượng - Hướng dẫn chi tiết 2026",
-    excerpt:
-      "Mẫu CV chuyên nghiệp được thiết kế bởi chuyên gia HR. Tăng 80% tỷ lệ được mời phỏng vấn với những tips viết CV thực chiến.",
-    category: "CV Guide",
-    image:
-      "https://images.unsplash.com/photo-1586281380349-632531db7ed4?auto=format&fit=crop&w=800&q=80",
-    author: "Trần Quốc Bảo",
-    publishedAt: "10/09/2026",
-    readTime: "8 phút",
-  },
-  {
-    id: 3,
-    title: "Phỏng vấn kỹ thuật: 30 câu hỏi thường gặp cho Developer",
-    excerpt:
-      "Tổng hợp các câu hỏi phỏng vấn Frontend, Backend, DevOps từ các công ty IT hàng đầu. Kèm câu trả lời mẫu và chiến thuật trả lời.",
-    category: "Interview",
-    image:
-      "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&w=800&q=80",
-    author: "Lê Thị Hồng",
-    publishedAt: "08/09/2026",
-    readTime: "12 phút",
-  },
-  {
-    id: 4,
-    title: "Mức lương ngành Marketing 2026 - Báo cáo chi tiết",
-    excerpt:
-      "Khảo sát 500+ ứng viên và 200+ doanh nghiệp. Cập nhật mức lương theo cấp bậc, khu vực và lĩnh vực trong ngành Marketing.",
-    category: "Salary",
-    image:
-      "https://images.unsplash.com/photo-1552664730-d307ca884978?auto=format&fit=crop&w=800&q=80",
-    author: "Phạm Đức Trung",
-    publishedAt: "05/09/2026",
-    readTime: "6 phút",
-  },
-];
-
-/* -------------------------------------------------------------------------- */
-/*                              TESTIMONIALS                                  */
-/* -------------------------------------------------------------------------- */
-
-export const testimonials: Testimonial[] = [
-  {
-    id: 1,
-    name: "Nguyễn Hoàng Nam",
-    role: "Senior Software Engineer",
-    avatar: "https://images.pravatar.cc/150?img=12",
-    content:
-      "ViecPro giúp tôi tìm được công việc mơ ước chỉ trong 2 tuần. AI gợi ý việc làm rất thông minh, phù hợp với kỹ năng và mong muốn của mình. Đặc biệt tính năng tạo CV miễn phí rất chuyên nghiệp.",
-    rating: 5,
-    company: "FPT Software",
-  },
-  {
-    id: 2,
-    name: "Trần Thị Mai Phương",
-    role: "Marketing Manager",
-    avatar: "https://images.pravatar.cc/150?img=47",
-    content:
-      "Sau nhiều tháng tìm việc không thành công, tôi đã nhận được 5 lời mời phỏng vấn chỉ sau 1 tuần đăng CV lên ViecPro. Nền tảng thực sự hiệu quả cho người tìm việc chuyên nghiệp.",
-    rating: 5,
-    company: "Shopee",
-  },
-  {
-    id: 3,
-    name: "Lê Văn Hùng",
-    role: "Product Designer",
-    avatar: "https://images.pravatar.cc/150?img=33",
-    content:
-      "Giao diện đẹp, dễ sử dụng, việc làm chất lượng cao. Tôi đã giới thiệu ViecPro cho rất nhiều bạn bè. Đây thực sự là sàn tuyển dụng tốt nhất Việt Nam hiện nay.",
-    rating: 5,
-    company: "MoMo",
-  },
-  {
-    id: 4,
-    name: "Phạm Thu Hà",
-    role: "HR Director",
-    avatar: "https://images.pravatar.cc/150?img=23",
-    content:
-      "Đội ngũ tuyển dụng của chúng tôi tiết kiệm được 60% thời gian sourcing nhờ ViecPro. Hồ sơ ứng viên chất lượng, bộ lọc thông minh giúp tìm đúng người trong thời gian ngắn.",
-    rating: 5,
-    company: "Vietcombank",
-  },
-];
-
-/* -------------------------------------------------------------------------- */
 /*                                NAVIGATION                                  */
 /* -------------------------------------------------------------------------- */
 
@@ -668,37 +545,6 @@ export const sortOptions: { label: string; value: string }[] = [
 ];
 
 /* -------------------------------------------------------------------------- */
-/*                                  STATS                                     */
-/* -------------------------------------------------------------------------- */
-
-export const stats = [
-  {
-    label: "Việc làm mới mỗi ngày",
-    value: 1200,
-    suffix: "+",
-    icon: "Briefcase",
-  },
-  {
-    label: "Nhà tuyển dụng uy tín",
-    value: 10000,
-    suffix: "+",
-    icon: "Building2",
-  },
-  {
-    label: "Ứng viên đăng ký",
-    value: 2500000,
-    suffix: "+",
-    icon: "Users",
-  },
-  {
-    label: "Tỷ lệ đặt việc thành công",
-    value: 92,
-    suffix: "%",
-    icon: "TrendingUp",
-  },
-];
-
-/* -------------------------------------------------------------------------- */
 /*                              COMPANY LOGOS                                 */
 /* -------------------------------------------------------------------------- */
 
@@ -772,49 +618,34 @@ export const features = [
   },
 ];
 
-export const footerLinks = {
-  column1: {
-    title: "Về ViecPro",
-    links: [
-      { label: "Giới thiệu", href: "#" },
-      { label: "Liên hệ", href: "#" },
-      { label: "Tuyển dụng ViecPro", href: "#" },
-      { label: "Báo chí", href: "#" },
-      { label: "Điều khoản sử dụng", href: "#" },
-      { label: "Chính sách bảo mật", href: "#" },
-    ],
-  },
-  column2: {
+export const footerLinks = [
+  {
     title: "Dành cho ứng viên",
     links: [
-      { label: "Tìm việc làm", href: "#" },
-      { label: "Tạo CV online", href: "#" },
-      { label: "Cẩm nang nghề nghiệp", href: "#" },
-      { label: "Công cụ tính lương", href: "#" },
-      { label: "Top công ty", href: "#" },
-      { label: "Việc làm theo ngành", href: "#" },
+      { label: "Tìm việc làm", href: "/viec-lam" },
+      { label: "Việc làm theo quốc gia", href: "/viec-lam" },
+      { label: "Việc làm theo ngành", href: "/viec-lam" },
+      { label: "Tạo hồ sơ CV", href: "#" },
     ],
   },
-  column3: {
+  {
     title: "Dành cho nhà tuyển dụng",
     links: [
       { label: "Đăng tin tuyển dụng", href: "#" },
       { label: "Tìm ứng viên", href: "#" },
       { label: "Bảng giá dịch vụ", href: "#" },
-      { label: "Quản lý hồ sơ", href: "#" },
+      { label: "Quản lý ứng viên", href: "#" },
       { label: "Hỗ trợ doanh nghiệp", href: "#" },
-      { label: "Liên hệ kinh doanh", href: "#" },
     ],
   },
-  column4: {
-    title: "Hỗ trợ",
+  {
+    title: "Công ty",
     links: [
-      { label: "Trung tâm trợ giúp", href: "#" },
-      { label: "Câu hỏi thường gặp", href: "#" },
-      { label: "Hướng dẫn sử dụng", href: "#" },
-      { label: "Báo cáo lỗi", href: "#" },
-      { label: "Góp ý cải tiến", href: "#" },
-      { label: "Hotline: 1900 1234", href: "#" },
+      { label: "Về chúng tôi", href: "#" },
+      { label: "Liên hệ", href: "#" },
+      { label: "Tuyển dụng nội bộ", href: "#" },
+      { label: "Báo chí & truyền thông", href: "#" },
+      { label: "Điều khoản & chính sách", href: "#" },
     ],
   },
-};
+];

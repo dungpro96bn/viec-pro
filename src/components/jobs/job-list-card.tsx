@@ -18,6 +18,7 @@ import {
   Clock,
 } from "lucide-react";
 import type { XkldJob } from "@/lib/xkld-data";
+import { jobHref } from "@/lib/job-details";
 
 const feeClass: Record<XkldJob["fee"], string> = {
   "Miễn phí": "badge--fee-free",
@@ -29,10 +30,13 @@ export function JobListCard({
   job,
   saved,
   onToggleSave,
+  onApply,
 }: {
   job: XkldJob;
   saved: boolean;
   onToggleSave: () => void;
+  /** Mở popup ứng tuyển ngay tại trang danh sách */
+  onApply: () => void;
 }) {
   const tagMatch = job.title.match(/^\[([^\]]+)\]/);
   const tag = tagMatch?.[1];
@@ -81,7 +85,7 @@ export function JobListCard({
       <div className="job-card__body">
         <div className="job-card__head">
           <h3 className="job-card__title">
-            <Link href="#">{cleanTitle}</Link>
+            <Link href={jobHref(job)}>{cleanTitle}</Link>
           </h3>
           {/* Nút lưu — cạnh tiêu đề (desktop) */}
           <button
@@ -144,11 +148,11 @@ export function JobListCard({
             >
               <MessageCircle size={14} />
             </Link>
-            <Link href="#" className="btn btn--primary btn--sm">
+            <button type="button" onClick={onApply} className="btn btn--primary btn--sm">
               <span className="job-card__apply-short">Ứng tuyển</span>
               <span className="job-card__apply-full">Ứng tuyển ngay</span>
               <ArrowRight size={12} className="job-card__apply-full" />
-            </Link>
+            </button>
           </div>
         </div>
 

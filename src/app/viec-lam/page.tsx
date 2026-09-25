@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import "./jobs.css";
 import { SiteHeader } from "@/components/home/site-header";
 import { SiteFooter } from "@/components/home/site-footer";
 import { JobsExplorer } from "@/components/jobs/jobs-explorer";

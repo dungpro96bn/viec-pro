@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useMemo, useState } from "react";
 import Link from "next/link";
 import {
   MapPin,
@@ -10,6 +10,8 @@ import {
   Sparkles,
   TrendingUp,
   ArrowRight,
+  ChevronLeft,
+  ChevronRight,
   Eye,
   Phone,
   MessageCircle,
@@ -18,7 +20,11 @@ import {
   Calendar,
   Tag,
 } from "lucide-react";
-import { sampleJobs, type XkldJob } from "@/lib/xkld-data";
+import { buildJobDataset, type XkldJob } from "@/lib/xkld-data";
+import { jobHref, toApplySummary } from "@/lib/job-details";
+import { JobApplyModal } from "@/components/job-detail/job-apply-modal";
+
+const PAGE_SIZE = 9;
 
 const feeClass: Record<XkldJob["fee"], string> = {
   "Miễn phí": "badge--fee-free",
@@ -26,15 +32,11 @@ const feeClass: Record<XkldJob["fee"], string> = {
   "Phí vừa": "badge--fee-mid",
 };
 
-const tabs = [
-  { id: "hot", label: "Việc làm HOT", icon: Flame },
-  { id: "new", label: "Mới nhất", icon: Sparkles },
-  { id: "high-salary", label: "Lương cao", icon: TrendingUp },
-] as const;
-
 export function FeaturedJobs() {
+  const allJobs = useMemo(() => buildJobDataset(), []);
   const [savedJobs, setSavedJobs] = useState<Set<number>>(new Set());
-  const [activeTab, setActiveTab] = useState<(typeof tabs)[number]["id"]>("hot");
+  const [currentPage, setCurrentPage] = useState(1);
+  const [applyJob, setApplyJob] = useState<XkldJob | null>(null);
 
   const toggleSave = (id: number) =>
     setSavedJobs((prev) => {
@@ -44,10 +46,8 @@ export function FeaturedJobs() {
       return next;
     });
 
-  const hotJobs = sampleJobs.filter((j) => j.isHot).slice(0, 6);
-  const newJobs = [...sampleJobs].sort((a, b) => a.id - b.id).slice(0, 6);
-  const highSalaryJobs = [...sampleJobs].sort((a, b) => b.salaryUsd - a.salaryUsd).slice(0, 6);
-  const jobs = activeTab === "hot" ? hotJobs : activeTab === "new" ? newJobs : highSalaryJobs;
+  const totalPages = Math.ceil(allJobs.length / PAGE_SIZE);
+  const jobs = allJobs.slice((currentPage - 1) * PAGE_SIZE, currentPage * PAGE_SIZE);
 
   return (
     <section id="jobs" className="section section--tinted">
@@ -64,26 +64,6 @@ export function FeaturedJobs() {
           </Link>
         </div>
 
-        {/* Tabs */}
-        <div className="tabs__list" role="tablist">
-          {tabs.map((tab) => {
-            const Icon = tab.icon;
-            return (
-              <button
-                key={tab.id}
-                type="button"
-                role="tab"
-                aria-selected={activeTab === tab.id}
-                className={`tabs__trigger${activeTab === tab.id ? " tabs__trigger--active" : ""}`}
-                onClick={() => setActiveTab(tab.id)}
-              >
-                <Icon size={14} />
-                {tab.label}
-              </button>
-            );
-          })}
-        </div>
-
         {/* Grid */}
         <div className="jgrid">
           {jobs.map((job) => (
@@ -92,9 +72,44 @@ export function FeaturedJobs() {
               job={job}
               saved={savedJobs.has(job.id)}
               onToggleSave={() => toggleSave(job.id)}
+              onApply={() => setApplyJob(job)}
             />
           ))}
         </div>
+
+        {totalPages > 1 && (
+          <nav className="featured__pagination" aria-label="Phân trang việc làm nổi bật">
+            <button
+              type="button"
+              className="featured__page"
+              onClick={() => setCurrentPage((page) => page - 1)}
+              disabled={currentPage === 1}
+              aria-label="Trang trước"
+            >
+              <ChevronLeft size={16} />
+            </button>
+            {Array.from({ length: totalPages }, (_, index) => index + 1).map((page) => (
+              <button
+                key={page}
+                type="button"
+                className={`featured__page${currentPage === page ? " featured__page--active" : ""}`}
+                onClick={() => setCurrentPage(page)}
+                aria-current={currentPage === page ? "page" : undefined}
+              >
+                {page}
+              </button>
+            ))}
+            <button
+              type="button"
+              className="featured__page"
+              onClick={() => setCurrentPage((page) => page + 1)}
+              disabled={currentPage === totalPages}
+              aria-label="Trang sau"
+            >
+              <ChevronRight size={16} />
+            </button>
+          </nav>
+        )}
 
         <div className="featured__cta">
           <Link href="/viec-lam" className="btn btn--primary btn--lg">
@@ -103,6 +118,10 @@ export function FeaturedJobs() {
           </Link>
         </div>
       </div>
+
+      {applyJob && (
+        <JobApplyModal key={applyJob.id} job={toApplySummary(applyJob)} autoOpen onClosed={() => setApplyJob(null)} />
+      )}
     </section>
   );
 }
@@ -111,10 +130,12 @@ function JobCard({
   job,
   saved,
   onToggleSave,
+  onApply,
 }: {
   job: XkldJob;
   saved: boolean;
   onToggleSave: () => void;
+  onApply: () => void;
 }) {
   const tagMatch = job.title.match(/^\[([^\]]+)\]/);
   const tag = tagMatch?.[1];
@@ -164,7 +185,7 @@ function JobCard({
 
       <div className="jcard__body">
         <h3 className="jcard__title">
-          <Link href="/viec-lam">{cleanTitle}</Link>
+          <Link href={jobHref(job)}>{cleanTitle}</Link>
         </h3>
 
         <div className="jcard__salary">
@@ -211,10 +232,10 @@ function JobCard({
         </div>
 
         <div className="jcard__actions">
-          <Link href="/viec-lam" className="btn btn--primary btn--sm">
+          <button type="button" onClick={onApply} className="btn btn--primary btn--sm">
             Ứng tuyển ngay
             <ArrowRight size={12} />
-          </Link>
+          </button>
           <Link href={`tel:${job.phone}`} className="btn btn--outline btn--sm btn--icon" aria-label={`Gọi ${job.phone}`}>
             <Phone size={14} />
           </Link>
